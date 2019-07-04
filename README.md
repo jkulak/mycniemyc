@@ -1,5 +1,6 @@
 ## Run
 
+- Generate certificate key pair for SSL support: `openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout server.key -out server.crt` and put the files in `./cert` directory
 - Build the image: `docker build -t app-image .`
 - Install node_modules locally: `docker run -ti --rm -v $(pwd):/app app-image yarn install`
 - Run the container `docker run -ti --rm -v $(pwd):/app -p 3003:3003 -p 9856:9856 --name app app-image`. Port `9856` is needed for the reload functionality while developing the app.
@@ -8,4 +9,4 @@
 ## Develop
 
 - Check if the container is running: `docker ps -a` and check for `app-image`
-- Login to a running container: `docker run -ti --rm -v $(pwd):/app app-image sh`
+- Login to a running container: `docker run -ti --rm -v $(pwd):/app app-image sh --login`

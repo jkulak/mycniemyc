@@ -1,25 +1,29 @@
 const express = require("express");
-const server = express();
+const fs = require("fs");
+const https = require("https");
 const reload = require("reload");
-
+const app = express();
 const hostname = "0.0.0.0";
 const port = 3003;
 
-server.use(function(req, res, next) {
+const options = {
+  key: fs.readFileSync("cert/server.key"),
+  cert: fs.readFileSync("cert/server.crt")
+};
+
+app.use(function(req, res, next) {
   console.log("🌍 " + req.url + " was requested.");
   next();
 });
 
-server.use("/", express.static(__dirname + "/public"));
+app.use("/", express.static(__dirname + "/public"));
 
 // Reload code here
-reload(server)
+reload(app, { https: { certAndKey: options } })
   .then(function(reloadReturned) {
-    // reloadReturned is documented in the returns API in the README
-
-    // Reload started, start web server
-    server.listen(port, hostname, () => {
-      console.log(`🌤  Server running at http://${hostname}:${port}/`);
+    // Reload started, start web app
+    https.createServer(options, app).listen(port, hostname, () => {
+      console.log(`🌤  Server running at http(s)://${hostname}:${port}/`);
     });
   })
   .catch(function(err) {
