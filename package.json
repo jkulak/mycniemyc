@@ -1,0 +1,17 @@
+{
+  "name": "mycniemyc",
+  "version": "0.0.1",
+  "description": "Website that tells you if to take your car to the car wash",
+  "main": "server.js",
+  "repository": "https://github.com/jkulak/mycniemyc",
+  "author": "Jakub Kułak <jakub.kulak@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "express": "^4.16.4",
+    "reload": "^3.0.1"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}

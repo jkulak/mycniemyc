@@ -1,0 +1,33 @@
+body {
+  font-family: "Raleway", sans-serif;
+  color: black;
+  /* background-color: sandybrown; */
+  margin: 30px;
+}
+
+h1 {
+  font-size: x-large;
+  margin-bottom: 30px;
+}
+
+#canvas {
+  border: 1px solid salmon;
+}
+
+#paused {
+  display: none;
+  justify-content: center; /* align horizontal */
+  align-items: center; /* align vertical */
+  min-height: 100%;
+  min-width: 100%;
+  font-size: 120px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  text-align: center;
+}
+
+#assets {
+  display: none;
+}
