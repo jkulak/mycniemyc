@@ -9,9 +9,10 @@
   "private": false,
   "devDependencies": {
     "express": "^4.16.4",
-    "reload": "^3.0.1"
+    "reload": "^3.0.1",
+    "supervisor": "0.12.0"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "./node_modules/.bin/supervisor -k -e html -i .git/,node_modules/ -- server.js"
   }
 }
