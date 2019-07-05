@@ -16,6 +16,15 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.use("/api", async function(req, res, next) {
+  console.log("api request", req.baseUrl, req.originalUrl);
+  const response = await fetch(
+    "https://api.darksky.net/forecast/6e3186336fe2a61b1327aea9c60d8ec5/" + lat + "," + lon
+  );
+
+  next({ res: response });
+});
+
 app.use("/", express.static(__dirname + "/public"));
 
 // Reload code here
