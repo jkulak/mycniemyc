@@ -15,7 +15,7 @@ const drawWeather = data => {
 const getWeather = async (lon, lat) => {
   const response = await fetch(
     // "https://api.darksky.net/forecast/6e3186336fe2a61b1327aea9c60d8ec5/" + lat + "," + lon
-    "/api/" + lat + "," + lon
+    "/api/forecast/" + lat + "," + lon
   );
 
   const myJson = await response.json();

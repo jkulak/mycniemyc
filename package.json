@@ -14,5 +14,9 @@
   },
   "scripts": {
     "start": "./node_modules/.bin/supervisor -k -e html,css,js -i .git/,node_modules/ -- server.js"
+  },
+  "dependencies": {
+    "@types/http-proxy": "^1.17.0",
+    "lodash": "^4.17.11"
   }
 }

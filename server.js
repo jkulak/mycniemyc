@@ -3,6 +3,11 @@ const fs = require("fs");
 const https = require("https");
 const reload = require("reload");
 const app = express();
+const _ = require("lodash");
+const url = require("url");
+const createProxyServer = require("http-proxy");
+const appAPIProxy = createProxyServer();
+
 const hostname = "0.0.0.0";
 const port = 3003;
 
@@ -16,13 +21,16 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.use("/api", async function(req, res, next) {
-  console.log("api request", req.baseUrl, req.originalUrl);
-  const response = await fetch(
-    "https://api.darksky.net/forecast/6e3186336fe2a61b1327aea9c60d8ec5/" + lat + "," + lon
-  );
-
-  next({ res: response });
+app.all("/api/*", (req, res) => {
+  const __path = _.drop(req.url.split("/"), 2);
+  appAPIProxy.proxyRequest(req, res, {
+    target: url.resolve(
+      "https://api.darksky.net/forecast/6e3186336fe2a61b1327aea9c60d8ec5/",
+      __path.join("/")
+    ),
+    port: 8001,
+    ignorePath: true
+  });
 });
 
 app.use("/", express.static(__dirname + "/public"));
