@@ -14,6 +14,3 @@ The app checks the forecast by fetching data via the free [Open-Meteo API](https
 - Optional use of the Geolocation API (with user consent) or a manual location input field (with a fallback search engine).
 - Supports Dark Mode and Light Mode.
 - Supports Polish and English. 
-
-## Made by
-Made with ❤️ by [jkulak](https://github.com/jkulak)
