@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">MyćCzyNieMyć - Czy warto myć auto?</title>
+    <!-- Czcionki Google wg wytycznych projektowych (nowoczesne) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <!-- Ikony Bootstrap, świetnie pasujące do aplikacji pogodowej i UI -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Overlay ładowania danych/geolokacji (Glassmorphism) -->
+        <div id="loader" class="glass-panel centered-panel">
+            <i class="bi bi-geo-alt-fill spin-icon"></i>
+            <h2 data-i18n="loader_title">Pobieranie lokalizacji i pogody...</h2>
+            <p data-i18n="loader_desc">Zezwól na lokalizację, abyśmy mogli doradzić, czy myć powóz.</p>
+        </div>
+
+        <main id="main-content" class="hidden">
+            <header class="location-header">
+                <i class="bi bi-geo-alt"></i> <span id="location-name">Lokalizowanie...</span>
+                <button id="change-location-btn" title="Zmień lokalizację"><i class="bi bi-pencil-square"></i></button>
+                <button id="lang-toggle-btn" title="Zmień język / Change language" class="theme-toggle">PL</button>
+                <button id="theme-toggle-btn" title="Przełącz motyw" data-i18n-title="toggle_theme"
+                    class="theme-toggle"><i class="bi bi-brightness-high"></i></button>
+            </header>
+
+            <section class="forecast-section">
+                <h3 class="subtitle" data-i18n="forecast_title">Prognoza na najbliższe 7 dni</h3>
+                <div id="forecast-grid" class="forecast-grid">
+                    <!-- Javascript wstawi dynamiczne kafelki tutaj na bazie Open-Meteo -->
+                </div>
+            </section>
+
+            <section class="verdict-section glass-panel">
+                <h3 class="subtitle" data-i18n="verdict_title">Na podstawie prognozy, proponujemy:</h3>
+                <h1 id="main-verdict" class="verdict-text">...</h1>
+                <p id="verdict-reason" class="reason-text">... </p>
+            </section>
+        </main>
+
+        <footer class="glass-panel footer-panel">
+            <p><span data-i18n="made_by">Made by</span> <a href="https://github.com/jkulak" target="_blank"
+                    id="info-trigger">jkulak</a> | <span data-i18n="data_from">Dane polegają na</span> <a
+                    href="https://open-meteo.com/" target="_blank">Open-Meteo</a></p>
+        </footer>
+    </div>
+
+    <!-- Modal informacyjny - Made by MyćCzyNieMyć -->
+    <div id="info-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel">
+            <h2 data-i18n="about_title">O Stronie</h2>
+            <p data-i18n="about_p1">MyćCzyNieMyć to bardzo prosty mechanizm dla kierowców.</p>
+            <p data-i18n="about_p2">Aplikacja sprawdza prognozę opadów używając darmowego interfejsu <strong>Open-Meteo
+                    API</strong> na
+                dzisiaj i najbliższe 2 dni dla Twojej dokładnej lokalizacji. Jeżeli spodziewane są jakiekolwiek opady
+                np. deszczu, śniegu lub mżawki, bezlitosny algorytm pokaże wielkim drukiem by wstrzymać się z myciem. W
+                przeciwnym razie śmiało - auto będzie darmowo czyste na minimum 3 dni z dzisiejszym włącznie!</p>
+            <button id="close-modal-btn" class="action-btn" data-i18n="about_close">Zrozumiano, zamknij</button>
+        </div>
+    </div>
+
+    <!-- Modal umożliwiający wpisanie miejscowości bez użycia Geolokacji Przeglądarki -->
+    <div id="location-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel">
+            <h2 data-i18n="search_title">Gdzie cię szukać?</h2>
+            <p data-i18n="search_desc">Wpisz miasto (np. Warszawa lub małą wieś), w okolicach na które rzucimy okiem
+                pogodowym.</p>
+            <div class="input-group">
+                <input type="text" id="manual-location-input" data-i18n-ph="search_placeholder"
+                    placeholder="np. Kraków...">
+                <button id="search-location-btn" class="action-btn"><i class="bi bi-search"></i></button>
+            </div>
+            <button id="close-location-modal-btn" class="action-btn secondary-btn"
+                data-i18n="search_cancel">Anuluj</button>
+        </div>
+    </div>
+
+    <script src="./app.js"></script>
+</body>
+
+</html>

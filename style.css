@@ -1,0 +1,488 @@
+:root {
+    /* Paleta kolorów tła - domyślnie Dark */
+    --bg-color-from: #0f172a;
+    /* Slate 900 */
+    --bg-color-mid: #1e293b;
+    /* Slate 800 */
+    --bg-color-to: #334155;
+    /* Slate 700 */
+
+    /* Tekst */
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+
+    /* Efekt szkła */
+    --glass-bg: rgba(30, 41, 59, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+
+    /* Ikony */
+    --icon-color: #e2e8f0;
+
+    /* Werdykty kolorystyczne */
+    --accent-wash: #10b981;
+    /* Zielono-szmaragdowy Myć */
+    --accent-no-wash: #ef4444;
+    /* Czerwony Nie myć */
+}
+
+/* Tryb jasny (nakładana klasa na body) */
+body.light-mode {
+    --bg-color-from: #f8fafc;
+    /* Jasny Slate */
+    --bg-color-mid: #e2e8f0;
+    --bg-color-to: #cbd5e1;
+
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-shadow: 0 8px 32px 0 rgba(30, 41, 59, 0.15);
+
+    /* Ikony ciemniejsze w jasnym trybie */
+    --icon-color: #334155;
+
+    --accent-wash: #059669;
+    /* Ciemniejszy zielony by lepiej kontrastował na jasnym */
+    --accent-no-wash: #dc2626;
+    /* Ciemniejszy czerwony */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--bg-color-from), var(--bg-color-mid), var(--bg-color-to));
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-attachment: fixed;
+    /* Dodatkowy blur pod spodem, by było czuć klimat interfejsu premium */
+}
+
+.app-container {
+    width: 100%;
+    max-width: 950px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 100vh;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 28px;
+    padding: 28px;
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.centered-panel {
+    margin: auto;
+    text-align: center;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    height: 350px;
+}
+
+.spin-icon {
+    font-size: 3.5rem;
+    animation: myPulse 2s infinite ease-in-out;
+    color: #38bdf8;
+    /* Lekki akcent błękitu na spinnerze z lodu/deszczu */
+}
+
+@keyframes myPulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.9);
+        opacity: 0.6;
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Header */
+.location-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-bottom: 25px;
+    justify-content: center;
+}
+
+.location-header i {
+    color: #fca5a5;
+}
+
+.location-header button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.theme-toggle {
+    margin-left: auto;
+    /* Przycisk przełączania motywu dosunięty minimalnie od środka by oddzielić */
+    font-size: 1.4rem !important;
+}
+
+.location-header button:hover {
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+/* Verdict Section */
+.verdict-section {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 50px 20px;
+    margin-top: 50px;
+    /* Zwiększony odstęp od kafelków pogody wg zaleceń */
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 700;
+}
+
+.verdict-text {
+    font-size: 6rem;
+    font-weight: 900;
+    line-height: 1;
+    margin: 15px 0;
+    text-transform: uppercase;
+    text-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transition: color 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    letter-spacing: -2px;
+}
+
+/* Kiedy pojawi się werdykt, dodamy delikatny hover, żeby żył własnym życiem */
+.verdict-text:hover {
+    transform: scale(1.05);
+}
+
+.verdict-text.wash {
+    color: var(--accent-wash);
+}
+
+.verdict-text.no-wash {
+    color: var(--accent-no-wash);
+}
+
+.reason-text {
+    font-size: 1.15rem;
+    font-weight: 300;
+    max-width: 500px;
+    margin: 0 auto;
+    color: var(--text-primary);
+}
+
+/* Forecast Grid */
+.forecast-section {
+    margin-top: 15px;
+}
+
+.forecast-section .subtitle {
+    margin-bottom: 20px;
+}
+
+.forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+}
+
+.forecast-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 12px 10px;
+    /* Zmniejszono padding, kafelki będą delikatnie niższe */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.3s ease;
+}
+
+.forecast-card:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.forecast-card.is-raining {
+    background: rgba(14, 165, 233, 0.15);
+    /* Niebieskie tło deszczowe Dark Mode */
+    border-color: rgba(14, 165, 233, 0.3);
+}
+
+body.light-mode .forecast-card.is-raining {
+    background: rgba(14, 165, 233, 0.25);
+    /* Mocniejsze niebieskie tło deszczowe Light Mode */
+    border-color: rgba(14, 165, 233, 0.4);
+}
+
+.fc-day {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+}
+
+.fc-icon {
+    font-size: 2.2rem;
+    margin: 8px 0;
+    color: var(--icon-color);
+}
+
+.fc-precip {
+    font-size: 1.15rem;
+    /* Zwiększono rozmiar deszczu */
+    color: #0284c7;
+    /* Silniejszy, bardziej wyraźny niebieski zarówno w jasnym i ciemnym */
+    font-weight: 700;
+}
+
+.fc-temp {
+    font-size: 0.85rem;
+    /* Zmniejszono mieję temperaturę */
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+/* Footer */
+.footer-panel {
+    margin-top: auto;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    border-radius: 20px;
+}
+
+.footer-panel a {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.footer-panel a:hover {
+    color: #38bdf8;
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeInModal 0.3s ease forwards;
+}
+
+@keyframes fadeInModal {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    max-width: 500px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.modal-content h2 {
+    font-weight: 700;
+    font-size: 1.8rem;
+}
+
+.modal-content p {
+    line-height: 1.6;
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+}
+
+.modal-content strong {
+    color: var(--text-primary);
+}
+
+.input-group {
+    display: flex;
+    gap: 12px;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    font-size: 1.05rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+}
+
+.input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.input-group input:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.action-btn {
+    padding: 16px 28px;
+    border: none;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.1s;
+    font-family: inherit;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+.action-btn.secondary-btn {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+}
+
+.action-btn.secondary-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Jasny motyw - Poprawki kontrastu dla modali i inputow */
+body.light-mode .input-group input {
+    background: rgba(15, 23, 42, 0.04);
+    border-color: rgba(15, 23, 42, 0.15);
+    color: var(--text-primary);
+}
+
+body.light-mode .input-group input::placeholder {
+    color: rgba(15, 23, 42, 0.4);
+}
+
+body.light-mode .input-group input:focus {
+    background: rgba(15, 23, 42, 0.08);
+    border-color: rgba(15, 23, 42, 0.3);
+}
+
+body.light-mode .action-btn {
+    background: rgba(15, 23, 42, 0.08);
+    color: var(--text-primary);
+}
+
+body.light-mode .action-btn:hover {
+    background: rgba(15, 23, 42, 0.12);
+}
+
+body.light-mode .action-btn.secondary-btn {
+    border-color: rgba(15, 23, 42, 0.2);
+    background: transparent;
+}
+
+body.light-mode .action-btn.secondary-btn:hover {
+    background: rgba(15, 23, 42, 0.05);
+}
+
+@media (max-width: 600px) {
+    .verdict-text {
+        font-size: 4.5rem;
+    }
+
+    .forecast-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .glass-panel {
+        padding: 20px;
+    }
+
+    .fc-precip {
+        font-size: 0.75rem;
+    }
+
+    .fc-temp {
+        font-size: 1rem;
+    }
+
+    .fc-day {
+        font-size: 0.85rem;
+    }
+
+    .fc-icon {
+        font-size: 1.8rem;
+    }
+
+    .centered-panel {
+        height: 250px;
+    }
+}
