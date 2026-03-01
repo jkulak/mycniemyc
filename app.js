@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchLocBtn = document.getElementById('search-location-btn');
     const langToggleBtn = document.getElementById('lang-toggle-btn');
 
+    // Global state cache for language switching without reload
+    let currentLat = null;
+    let currentLon = null;
+    let currentDailyData = null;
+
     // Theme initialization
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') {
@@ -176,12 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         translateUI();
 
-        // Re-resolve location name in new language if it's available
-        const currentLocText = locationNameEl.textContent;
-        // Re-run the weather process if we already have daily data cached
-        // For simplicity, we can just reload the page or re-fetch. 
-        // Reloading is the cleanest way to ensure all dynamic data (dates/cities) refreshes correctly immediately.
-        location.reload();
+        // Re-resolve location name in new language if we have coordinates
+        if (currentLat !== null && currentLon !== null) {
+            resolveLocationName(currentLat, currentLon);
+        }
+
+        // Re-render the weather processing if we have cached daily data
+        if (currentDailyData !== null) {
+            processWeatherData(currentDailyData);
+        }
     });
 
     function t(key) {
@@ -286,6 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchWeatherData(lat, lon) {
+        currentLat = lat;
+        currentLon = lon;
         try {
             // daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`;
@@ -311,6 +321,8 @@ document.addEventListener('DOMContentLoaded', () => {
             showManualLocationPrompt(t('err_server'));
             return;
         }
+
+        currentDailyData = daily;
 
         const { time, weathercode, temperature_2m_max, temperature_2m_min, precipitation_sum } = daily;
 
