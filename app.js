@@ -43,12 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Modals interactions
-    infoTrigger.addEventListener('click', (e) => {
-        e.preventDefault();
-        infoModal.classList.remove('hidden');
-    });
-    closeModalBtn.addEventListener('click', () => infoModal.classList.add('hidden'));
-
     changeLocBtn.addEventListener('click', () => {
         locationModal.classList.remove('hidden');
         setTimeout(() => manualLocInput.focus(), 100);
