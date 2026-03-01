@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Słownik tłumaczeń (i18n) ---
     const translations = {
         pl: {
-            title: "MyćCzyNieMyć - Czy warto myć auto?",
+            title: "Czy warto myć auto?",
             loader_title: "Pobieranie lokalizacji i pogody...",
             loader_desc: "Zezwól na lokalizację, abyśmy mogli doradzić, czy myć powóz.",
             locating: "Lokalizowanie...",
@@ -75,10 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
             toggle_theme: "Przełącz motyw",
             forecast_title: "Prognoza na najbliższe 7 dni",
             verdict_title: "Na podstawie prognozy, proponujemy:",
-            made_by: "Made by",
+            made_by: "Realizacja",
             data_from: "Dane polegają na",
             about_title: "O Stronie",
-            about_p1: "MyćCzyNieMyć to bardzo prosty mechanizm dla kierowców.",
+            about_p1: "Myć nie myć to bardzo prosty mechanizm dla kierowców.",
             about_p2: "Aplikacja sprawdza prognozę opadów używając darmowego interfejsu <strong>Open-Meteo API</strong> na dzisiaj i najbliższe 2 dni dla Twojej dokładnej lokalizacji. Jeżeli spodziewane są jakiekolwiek opady np. deszczu, śniegu lub mżawki, bezlitosny algorytm pokaże wielkim drukiem by wstrzymać się z myciem. W przeciwnym razie śmiało - auto będzie darmowo czyste na minimum 3 dni z dzisiejszym włącznie!",
             about_close: "Zrozumiano, zamknij",
             search_title: "Gdzie cię szukać?",
@@ -151,7 +151,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check localStorage for saved lang override
     const savedLang = localStorage.getItem('language');
-    let currentLang = savedLang ? savedLang : (browserLang.startsWith('pl') ? 'pl' : 'en');
+
+    // Check domain for default lang
+    const hostname = window.location.hostname;
+    let defaultLang = 'pl'; // fallback
+    if (hostname.includes('washornot.today')) {
+        defaultLang = 'en';
+    } else if (hostname.includes('mycniemyc.pl')) {
+        defaultLang = 'pl';
+    } else {
+        defaultLang = browserLang.startsWith('pl') ? 'pl' : 'en';
+    }
+
+    let currentLang = savedLang ? savedLang : defaultLang;
 
     // Initialize language toggle button
     langToggleBtn.textContent = currentLang === 'pl' ? 'EN' : 'PL';
