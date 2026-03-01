@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="title">MyćCzyNieMyć - Czy warto myć auto?</title>
+    <title data-i18n="title">Myć nie myć? Czy warto dzisiaj umyć samochód?</title>
     <!-- OpenGraph / Social Media Meta Tags -->
     <meta property="og:title" content="Myć nie myć? Czy warto dzisiaj umyć samochód?" />
     <meta property="og:description"
@@ -34,7 +34,7 @@
         <div id="loader" class="glass-panel centered-panel">
             <i class="bi bi-geo-alt-fill spin-icon"></i>
             <h2 data-i18n="loader_title">Pobieranie lokalizacji i pogody...</h2>
-            <p data-i18n="loader_desc">Zezwól na lokalizację, abyśmy mogli doradzić, czy myć powóz.</p>
+            <p data-i18n="loader_desc">Zezwól na lokalizację, abyśmy mogli doradzić, czy umyć dzisiaj samochód.</p>
         </div>
 
         <main id="main-content" class="hidden">
@@ -71,12 +71,12 @@
     <div id="info-modal" class="modal-overlay hidden">
         <div class="modal-content glass-panel">
             <h2 data-i18n="about_title">O Stronie</h2>
-            <p data-i18n="about_p1">MyćCzyNieMyć to bardzo prosty mechanizm dla kierowców.</p>
+            <p data-i18n="about_p1">Myć czy nie myć to bardzo prosty mechanizm dla kierowców.</p>
             <p data-i18n="about_p2">Aplikacja sprawdza prognozę opadów używając darmowego interfejsu <strong>Open-Meteo
                     API</strong> na
-                dzisiaj i najbliższe 2 dni dla Twojej dokładnej lokalizacji. Jeżeli spodziewane są jakiekolwiek opady
-                np. deszczu, śniegu lub mżawki, bezlitosny algorytm pokaże wielkim drukiem by wstrzymać się z myciem. W
-                przeciwnym razie śmiało - auto będzie darmowo czyste na minimum 3 dni z dzisiejszym włącznie!</p>
+                dzisiaj i najbliższe kilka dni dla podanej lokalizacji. Jeżeli spodziewane są jakiekolwiek opady
+                np. deszczu, śniegu lub mżawki, algorytm pokaże by wstrzymać się z myciem. W
+                przeciwnym razie śmiało - auto po myciu będzie czyste przez minimum 3 dni!</p>
             <button id="close-modal-btn" class="action-btn" data-i18n="about_close">Zrozumiano, zamknij</button>
         </div>
     </div>
@@ -85,8 +85,7 @@
     <div id="location-modal" class="modal-overlay hidden">
         <div class="modal-content glass-panel">
             <h2 data-i18n="search_title">Gdzie cię szukać?</h2>
-            <p data-i18n="search_desc">Wpisz miasto (np. Warszawa lub małą wieś), w okolicach na które rzucimy okiem
-                pogodowym.</p>
+            <p data-i18n="search_desc">Wpisz miasto (np. Warszawa lub Mała Wieś), w okolicy, która Cię interesuje.</p>
             <div class="input-group">
                 <input type="text" id="manual-location-input" data-i18n-ph="search_placeholder"
                     placeholder="np. Kraków...">
