@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Słownik tłumaczeń (i18n) ---
     const translations = {
         pl: {
-            title: "Czy warto myć auto?",
+            title: "Czy warto umyć auto?",
             loader_title: "Pobieranie lokalizacji i pogody...",
             loader_desc: "Zezwól na lokalizację, abyśmy mogli doradzić, czy myć powóz.",
             locating: "Lokalizowanie...",
