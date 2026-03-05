@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const loader = document.getElementById('loader');
     const mainContent = document.getElementById('main-content');
-    const locationNameEl = document.getElementById('location-name');
+    const locationInput = document.getElementById('location-input');
     const verdictTextEl = document.getElementById('main-verdict');
     const verdictReasonEl = document.getElementById('verdict-reason');
     const forecastGridEl = document.getElementById('forecast-grid');
@@ -10,18 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const infoModal = document.getElementById('info-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
 
-    const changeLocBtn = document.getElementById('change-location-btn');
+    // const changeLocBtn = document.getElementById('change-location-btn'); // Removed
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
     const locationModal = document.getElementById('location-modal');
     const closeLocModalBtn = document.getElementById('close-location-modal-btn');
     const manualLocInput = document.getElementById('manual-location-input');
     const searchLocBtn = document.getElementById('search-location-btn');
     const langToggleBtn = document.getElementById('lang-toggle-btn');
+    const searchLocBtnDefaultContent = searchLocBtn ? searchLocBtn.innerHTML : '';
 
     // Global state cache for language switching without reload
     let currentLat = null;
     let currentLon = null;
     let currentDailyData = null;
+    let lastFocusedElement = null;
 
     // Theme initialization
     const savedTheme = localStorage.getItem('theme');
@@ -40,20 +42,76 @@ document.addEventListener('DOMContentLoaded', () => {
             themeToggleBtn.innerHTML = '<i class="bi bi-brightness-high"></i>';
             localStorage.setItem('theme', 'dark');
         }
+        updateThemeToggleA11y();
     });
 
     // Modals interactions
-    changeLocBtn.addEventListener('click', () => {
-        locationModal.classList.remove('hidden');
-        setTimeout(() => manualLocInput.focus(), 100);
+    function openModal(modalEl, triggerEl, preferredFocusEl) {
+        lastFocusedElement = triggerEl || document.activeElement;
+        modalEl.classList.remove('hidden');
+        const firstFocusable = preferredFocusEl || modalEl.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (firstFocusable) {
+            setTimeout(() => firstFocusable.focus(), 50);
+        }
+    }
+
+    function closeModal(modalEl) {
+        modalEl.classList.add('hidden');
+        if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+            lastFocusedElement.focus();
+        }
+        lastFocusedElement = null;
+    }
+
+    function setLocationValue(city, region) {
+        if (!locationInput) return;
+        // Strip "Województwo " prefix if present (case-insensitive)
+        const cleanRegion = region ? region.replace(/województwo\s+/i, '') : '';
+        locationInput.value = cleanRegion ? `${city || ''}, ${cleanRegion}` : (city || '');
+    }
+
+    locationInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const query = locationInput.value.trim();
+            if (query.length >= 2) {
+                searchCity(query);
+                locationInput.blur();
+            }
+        }
     });
-    closeLocModalBtn.addEventListener('click', () => locationModal.classList.add('hidden'));
+
+    locationInput.addEventListener('focus', () => {
+        locationInput.select();
+    });
+    closeLocModalBtn.addEventListener('click', () => closeModal(locationModal));
+    closeModalBtn.addEventListener('click', () => closeModal(infoModal));
+    if (infoTrigger) {
+        infoTrigger.addEventListener('click', () => openModal(infoModal, infoTrigger, closeModalBtn));
+    }
+
+    [infoModal, locationModal].forEach((overlay) => {
+        overlay.addEventListener('click', (event) => {
+            if (event.target === overlay) {
+                closeModal(overlay);
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        if (!locationModal.classList.contains('hidden')) {
+            closeModal(locationModal);
+            return;
+        }
+        if (!infoModal.classList.contains('hidden')) {
+            closeModal(infoModal);
+        }
+    });
 
     searchLocBtn.addEventListener('click', () => {
         const query = manualLocInput.value.trim();
         if (query.length >= 2) {
             searchCity(query);
-            locationModal.classList.add('hidden');
         }
     });
 
@@ -63,17 +121,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Słownik tłumaczeń (i18n) ---
+    // --- słownik tłumaczeń (i18n) ---
     const translations = {
         pl: {
             title: "Czy warto umyć auto?",
             loader_title: "Pobieranie lokalizacji i pogody...",
-            loader_desc: "Zezwól na lokalizację, abyśmy mogli doradzić, czy myć powóz.",
+            loader_desc: "Wpisz konkretną lokalizację",
             locating: "Lokalizowanie...",
             change_location: "Zmień lokalizację",
+            change_language: "Zmień język",
             toggle_theme: "Przełącz motyw",
+            switch_to_light: "Przełącz na jasny motyw",
+            switch_to_dark: "Przełącz na ciemny motyw",
             forecast_title: "Prognoza na najbliższe 7 dni",
-            verdict_title: "Na podstawie prognozy, proponujemy:",
+            verdict_title: "Na podstawie prognozy proponujemy:",
             made_by: "GiHub",
             data_from: "Dane polegają na",
             about_title: "O Stronie",
@@ -98,20 +159,28 @@ document.addEventListener('DOMContentLoaded', () => {
             day_today: "Dzisiaj",
             day_tomorrow: "Jutro",
             day_today_short: "Dziś",
-            verdict_no: "NIE MYĆ!",
+            use_my_location: "Użyj mojej lokalizacji",
+            enter_city_manually: "Wpisz miasto ręcznie",
+            affects_result: "Wpływa na wynik",
+            info_about_page: "Informacje o stronie",
+            search_loading: "Szukam...",
+            verdict_no: "🙅🏻‍♂️ Nie myć",
             verdict_no_reason: "Lepiej przełóż to na później. Prognozujemy opady:",
             verdict_and: "oraz",
-            verdict_yes: "MYĆ!",
+            verdict_yes: "🧼 Myć",
             verdict_yes_reason: "Świetne wieści! Przez najbliższe 3 dni spodziewany jest całkowity brak opadów."
         },
         en: {
             title: "To Wash or Not To Wash?",
             loader_title: "Fetching location and weather...",
-            loader_desc: "Allow location access so we can advise if you should wash your car.",
+            loader_desc: "Enter your specific location",
             locating: "Locating...",
             change_location: "Change location",
+            change_language: "Change language",
             toggle_theme: "Toggle theme",
-            forecast_title: "7-Day Forecast",
+            switch_to_light: "Switch to light mode",
+            switch_to_dark: "Switch to dark mode",
+            forecast_title: "7-day forecast",
             verdict_title: "Based on the forecast, we suggest:",
             made_by: "GitHub",
             data_from: "Data relies on",
@@ -137,10 +206,15 @@ document.addEventListener('DOMContentLoaded', () => {
             day_today: "Today",
             day_tomorrow: "Tomorrow",
             day_today_short: "Today",
-            verdict_no: "DO NOT WASH!",
+            use_my_location: "Use my location",
+            enter_city_manually: "Enter city manually",
+            affects_result: "Affects result",
+            info_about_page: "About this page",
+            search_loading: "Searching...",
+            verdict_no: "🙅🏻‍♂️ Don't wash",
             verdict_no_reason: "Better put it off for later. We forecast precipitation:",
             verdict_and: "and",
-            verdict_yes: "WASH!",
+            verdict_yes: "🧼 Wash",
             verdict_yes_reason: "Great news! Total lack of precipitation is expected over the next 3 days."
         }
     };
@@ -207,6 +281,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-i18n-ph]').forEach(el => {
             el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
         });
+
+        document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+            el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
+        });
+
+        if (langToggleBtn) langToggleBtn.setAttribute('aria-label', t('change_language'));
+        if (infoTrigger) infoTrigger.setAttribute('aria-label', t('info_about_page'));
+        updateThemeToggleA11y();
     }
 
     // Start application logic
@@ -214,42 +296,122 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initApp() {
         translateUI(); // Translate static HTML at boot
-        // Try to get geocoded position from browser
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    fetchWeatherData(position.coords.latitude, position.coords.longitude);
-                    resolveLocationName(position.coords.latitude, position.coords.longitude);
-                },
-                (error) => {
-                    console.warn("Geolocation denied or error:", error);
-                    showManualLocationPrompt();
-                },
-                { timeout: 10000, maximumAge: 600000 }
-            );
-        } else {
+        showInitialChoicePanel();
+    }
+
+    function updateThemeToggleA11y() {
+        if (!themeToggleBtn) return;
+        const goesToLightMode = !document.body.classList.contains('light-mode');
+        const label = goesToLightMode ? t('switch_to_light') : t('switch_to_dark');
+        themeToggleBtn.setAttribute('aria-label', label);
+        themeToggleBtn.setAttribute('title', label);
+    }
+
+    function requestUserGeolocation() {
+        if (!("geolocation" in navigator)) {
             showManualLocationPrompt();
+            return;
+        }
+
+        showLoading();
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                fetchWeatherData(position.coords.latitude, position.coords.longitude);
+                resolveLocationName(position.coords.latitude, position.coords.longitude);
+            },
+            (error) => {
+                console.warn("Geolocation denied or error:", error);
+                showManualLocationPrompt();
+            },
+            { timeout: 10000, maximumAge: 600000 }
+        );
+    }
+
+    function showInitialChoicePanel() {
+        loader.classList.remove('hidden');
+        mainContent.classList.add('hidden');
+        loader.innerHTML = `
+            <div class="weather-fly-animation">
+                <i class="bi bi-sun"></i>
+                <i class="bi bi-cloud-sun"></i>
+                <i class="bi bi-cloud"></i>
+                <i class="bi bi-cloud-rain"></i>
+            </div>
+            <h2>${t('loader_title')}</h2>
+            <p>${t('loader_desc')}</p>
+            
+            <div class="loader-actions">
+                <div class="location-wrapper input-with-icon landing-input-group">
+                    <i class="bi bi-geo-alt location-icon" aria-hidden="true"></i>
+                    <input type="text" id="landing-location-input" class="text-input location-input" placeholder="${t('search_placeholder')}" aria-label="${t('search_placeholder')}">
+                </div>
+                
+                <div class="divider-text">${t('verdict_and') === 'oraz' ? 'lub' : 'or'}</div>
+
+                <button class="action-btn secondary-btn" id="use-geolocation-btn">
+                    <i class="bi bi-crosshair"></i> ${t('use_my_location')}
+                </button>
+            </div>
+        `;
+
+        const useGeolocationBtn = document.getElementById('use-geolocation-btn');
+        const landingInput = document.getElementById('landing-location-input');
+
+        if (useGeolocationBtn) {
+            useGeolocationBtn.addEventListener('click', requestUserGeolocation);
+        }
+
+        if (landingInput) {
+            landingInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = landingInput.value.trim();
+                    if (query.length >= 2) {
+                        searchCity(query);
+                    }
+                }
+            });
+            setTimeout(() => landingInput.focus(), 100);
         }
     }
 
     function showManualLocationPrompt(message = t('prompt_manual_msg')) {
         loader.innerHTML = `
-            <i class="bi bi-geo-alt-fill spin-icon" style="color:#ef4444; animation:none; transform:scale(1);"></i>
+            <i class="bi bi-geo-alt-fill spin-icon loader-icon--error" aria-hidden="true"></i>
             <h2>${t('prompt_manual_title')}</h2>
             <p>${message}</p>
-            <button class="action-btn" id="initial-manual-btn" style="margin-top:15px;"><i class="bi bi-search"></i> ${t('prompt_manual_btn')}</button>
+            <div class="loader-actions">
+                <div class="location-wrapper input-with-icon landing-input-group">
+                    <i class="bi bi-geo-alt location-icon" aria-hidden="true"></i>
+                    <input type="text" id="manual-prompt-input" class="text-input location-input" placeholder="${t('search_placeholder')}" aria-label="${t('search_placeholder')}">
+                </div>
+            </div>
         `;
-        document.getElementById('initial-manual-btn').addEventListener('click', () => {
-            locationModal.classList.remove('hidden');
-            setTimeout(() => manualLocInput.focus(), 100);
-        });
+        
+        const manualInput = document.getElementById('manual-prompt-input');
+        if (manualInput) {
+            manualInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = manualInput.value.trim();
+                    if (query.length >= 2) {
+                        searchCity(query);
+                    }
+                }
+            });
+            // Auto-focus input
+            setTimeout(() => manualInput.focus(), 100);
+        }
     }
 
     function showLoading() {
         loader.classList.remove('hidden');
         mainContent.classList.add('hidden');
         loader.innerHTML = `
-            <i class="bi bi-cloud-arrow-down-fill spin-icon"></i>
+            <div class="weather-fly-animation">
+                <i class="bi bi-sun"></i>
+                <i class="bi bi-cloud-sun"></i>
+                <i class="bi bi-cloud"></i>
+                <i class="bi bi-cloud-rain"></i>
+            </div>
             <h2>${t('loading_title')}</h2>
             <p>${t('loading_desc')}</p>
         `;
@@ -257,14 +419,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function searchCity(query) {
         showLoading();
+        setSearchButtonLoading(true);
         try {
             // Geocoding using Open-Meteo
-            const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=pl&format=json`);
+            const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=${currentLang}&format=json`);
             const data = await res.json();
 
             if (data.results && data.results.length > 0) {
                 const city = data.results[0];
-                locationNameEl.textContent = `${city.name}, ${city.admin1 || city.country}`;
+                setLocationValue(city.name, city.admin1 || city.country || '');
+                closeModal(locationModal);
                 fetchWeatherData(city.latitude, city.longitude);
             } else {
                 throw new Error("City not found");
@@ -272,18 +436,32 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.error(e);
             showManualLocationPrompt(t('err_notfound'));
+        } finally {
+            setSearchButtonLoading(false);
         }
     }
 
+    function setSearchButtonLoading(isLoading) {
+        if (!searchLocBtn) return;
+        searchLocBtn.disabled = isLoading;
+        if (isLoading) {
+            searchLocBtn.innerHTML = `<span class="spinner" aria-hidden="true"></span><span class="sr-only">${t('search_loading')}</span>`;
+            searchLocBtn.setAttribute('aria-label', t('search_loading'));
+            return;
+        }
+        searchLocBtn.innerHTML = searchLocBtnDefaultContent;
+        searchLocBtn.removeAttribute('aria-label');
+    }
+
     async function resolveLocationName(lat, lon) {
-        // Reverse geocoding (using bigdatacloud free api for simplicity, no key needed)
         try {
             const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${currentLang}`);
             const data = await res.json();
-            // Czasem zwraca pustą nazwę jeśli wieś, wtedy weź locality lub country
-            locationNameEl.textContent = data.city || data.locality || data.principalSubdivision || t('satellite_view');
+            const cityPart = data.city || data.locality || data.principalSubdivision || t('satellite_view');
+            const regionPart = (data.city || data.locality) ? (data.principalSubdivision || data.countryName || '') : '';
+            setLocationValue(cityPart, regionPart);
         } catch (e) {
-            locationNameEl.textContent = t('current_loc');
+            setLocationValue(t('current_loc'), '');
         }
     }
 
@@ -302,9 +480,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.error(e);
             loader.innerHTML = `
-                <i class="bi bi-x-circle-fill spin-icon" style="color:#ef4444; animation:none; transform:scale(1);"></i>
+                <i class="bi bi-x-circle-fill spin-icon loader-icon--error" aria-hidden="true"></i>
                 <h2>${t('err_conn')}</h2>
-                <button class="action-btn" onclick="location.reload()" style="margin-top:20px;">${t('refresh_btn')}</button>
+                <button class="action-btn loader-refresh-btn" onclick="location.reload()">${t('refresh_btn')}</button>
             `;
         }
     }
@@ -324,15 +502,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let rainReason = [];
 
         // Algorytm: Sprawdzamy dzisiaj + 2 kolejne dni (3 dni)
-        // Jeśli precipitation_sum[i] > 0, decydujemy NIE MYĆ.
+        // Jeśli precipitation_sum[i] > 0, decydujemy nie myć.
         // Precipitation sum podane jest w milimetrach (mm).
         for (let i = 0; i < 3 && i < time.length; i++) {
             if (precipitation_sum[i] > 0) {
                 shouldWash = false;
                 const d = new Date(time[i]);
                 let dayName = d.toLocaleDateString(currentLang === 'pl' ? 'pl-PL' : 'en-US', { weekday: 'long' });
-                // Zamien pierwsza litere na wielka
-                dayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+                // Zamień pierwszą literę na wielką
+                // dayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
 
                 let dayLabel = dayName;
                 if (i === 0) dayLabel = t('day_today');
@@ -379,23 +557,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const card = document.createElement('div');
-            card.className = 'forecast-card' + (precip[i] > 0 ? ' is-raining' : '');
+            const inAlgorithmClass = i < 3 ? ' in-algorithm' : '';
+            card.className = 'forecast-card' + (precip[i] > 0 ? ' is-raining' : '') + inAlgorithmClass;
 
             const iconClass = getWeatherIcon(codes[i]);
 
             // Minimalistyczne ładowanie temperatury - średnia albo min/max
             card.innerHTML = `
                 <div class="fc-day">${dayName}</div>
+                ${i < 3 ? `<span class="fc-algorithm-badge" title="${t('affects_result')}" aria-label="${t('affects_result')}"><i class="bi bi-eye-fill" aria-hidden="true"></i></span>` : ''}
                 <div class="fc-icon"><i class="${iconClass}"></i></div>
                 <div class="fc-precip"><i class="bi bi-droplet"></i> ${precip[i]} mm</div>
-                <div class="fc-temp">${Math.round(tMin[i])}° - ${Math.round(tMax[i])}°</div>
+                                <div class="fc-temp"><span class="fc-temp-max">${Math.round(tMax[i])}°</span> <span class="fc-temp-min">${Math.round(tMin[i])}°</span></div>
             `;
             forecastGridEl.appendChild(card);
         }
     }
 
-    // WMO Weather interpretation codes
-    // Mapowanie na ikony Bootstrap Icons
+    // WMO weather interpretation codes
+    // Mapowanie na ikony Bootstrap icons
     function getWeatherIcon(code) {
         if (code === 0) return 'bi bi-sun';
         if (code === 1 || code === 2) return 'bi bi-cloud-sun';

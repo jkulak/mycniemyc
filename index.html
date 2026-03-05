@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Sprawdź prognozę pogody i zdecyduj, czy dzisiaj jest dobry dzień na mycie samochodu.">
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%230ea5e9' d='M40 8c0 6-8 10-8 18a8 8 0 0 0 16 0c0-8-8-12-8-18z'/%3E%3Cpath fill='%23334155' d='M12 36h4l4-10h24l4 10h4a4 4 0 0 1 4 4v8h-4a6 6 0 0 1-12 0H24a6 6 0 0 1-12 0H8v-8a4 4 0 0 1 4-4zm14 12a2 2 0 1 0-4 0 2 2 0 0 0 4 0zm24 0a2 2 0 1 0-4 0 2 2 0 0 0 4 0z'/%3E%3C/svg%3E">
     <title data-i18n="title">Myć nie myć? Czy warto dzisiaj umyć samochód?</title>
     <!-- OpenGraph / Social Media Meta Tags -->
     <meta property="og:title" content="Myć nie myć? Czy warto dzisiaj umyć samochód?" />
@@ -31,7 +35,7 @@
     <!-- Czcionki Google wg wytycznych projektowych (nowoczesne) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <!-- Ikony Bootstrap, świetnie pasujące do aplikacji pogodowej i UI -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="./style.css">
@@ -41,31 +45,46 @@
     <div class="app-container">
         <!-- Overlay ładowania danych/geolokacji (Glassmorphism) -->
         <div id="loader" class="glass-panel centered-panel">
-            <i class="bi bi-geo-alt-fill spin-icon"></i>
+            <div class="weather-fly-animation">
+                <i class="bi bi-sun"></i>
+                <i class="bi bi-cloud-sun"></i>
+                <i class="bi bi-cloud"></i>
+                <i class="bi bi-cloud-rain"></i>
+            </div>
             <h2 data-i18n="loader_title">Pobieranie lokalizacji i pogody...</h2>
-            <p data-i18n="loader_desc">Zezwól na lokalizację, abyśmy mogli doradzić, czy umyć dzisiaj samochód.</p>
+            <p data-i18n="loader_desc">Wpisz konkretną lokalizację</p>
         </div>
 
-        <main id="main-content" class="hidden">
+        <main id="main-content" class="hidden" aria-live="polite">
             <header class="location-header">
-                <i class="bi bi-geo-alt"></i> <span id="location-name">Lokalizowanie...</span>
-                <button id="change-location-btn" title="Zmień lokalizację"><i class="bi bi-pencil-square"></i></button>
-                <button id="lang-toggle-btn" title="Zmień język / Change language" class="theme-toggle">PL</button>
-                <button id="theme-toggle-btn" title="Przełącz motyw" data-i18n-title="toggle_theme"
-                    class="theme-toggle"><i class="bi bi-brightness-high"></i></button>
+                <div class="location-wrapper input-with-icon">
+                    <i class="bi bi-geo-alt location-icon" aria-hidden="true"></i>
+                    <input type="text" id="location-input" class="text-input location-input" data-i18n-ph="search_placeholder" data-i18n-aria="change_location" placeholder="np. Kraków...">
+                </div>
+                <div class="header-actions">
+                    <button id="info-trigger" title="Informacje o stronie" aria-label="Informacje o stronie"><i
+                            class="bi bi-info-circle"></i></button>
+                    <button id="lang-toggle-btn" title="Zmień język / Change language" aria-label="Change language"
+                        class="theme-toggle">PL</button>
+                    <button id="theme-toggle-btn" title="Przełącz motyw" aria-label="Przełącz motyw"
+                        data-i18n-title="toggle_theme"
+                        class="theme-toggle"><i class="bi bi-brightness-high"></i></button>
+                </div>
             </header>
+
+            <section class="verdict-section glass-panel">
+                <h3 class="subtitle" data-i18n="verdict_title">Na podstawie prognozy, proponujemy:</h3>
+                <div class="verdict-main-line">
+                    <h1 id="main-verdict" class="verdict-text">...</h1>
+                </div>
+                <p id="verdict-reason" class="reason-text">... </p>
+            </section>
 
             <section class="forecast-section">
                 <h3 class="subtitle" data-i18n="forecast_title">Prognoza na najbliższe 7 dni</h3>
                 <div id="forecast-grid" class="forecast-grid">
                     <!-- Javascript wstawi dynamiczne kafelki tutaj na bazie Open-Meteo -->
                 </div>
-            </section>
-
-            <section class="verdict-section glass-panel">
-                <h3 class="subtitle" data-i18n="verdict_title">Na podstawie prognozy, proponujemy:</h3>
-                <h1 id="main-verdict" class="verdict-text">...</h1>
-                <p id="verdict-reason" class="reason-text">... </p>
             </section>
         </main>
 
@@ -78,8 +97,8 @@
 
     <!-- Modal informacyjny - Made by MyćCzyNieMyć -->
     <div id="info-modal" class="modal-overlay hidden">
-        <div class="modal-content glass-panel">
-            <h2 data-i18n="about_title">O Stronie</h2>
+        <div class="modal-content glass-panel" role="dialog" aria-modal="true" aria-labelledby="info-modal-title">
+            <h2 id="info-modal-title" data-i18n="about_title">O Stronie</h2>
             <p data-i18n="about_p1">Myć czy nie myć to bardzo prosty mechanizm dla kierowców.</p>
             <p data-i18n="about_p2">Aplikacja sprawdza prognozę opadów używając darmowego interfejsu <strong>Open-Meteo
                     API</strong> na
@@ -92,11 +111,11 @@
 
     <!-- Modal umożliwiający wpisanie miejscowości bez użycia Geolokacji Przeglądarki -->
     <div id="location-modal" class="modal-overlay hidden">
-        <div class="modal-content glass-panel">
-            <h2 data-i18n="search_title">Gdzie cię szukać?</h2>
+        <div class="modal-content glass-panel" role="dialog" aria-modal="true" aria-labelledby="location-modal-title">
+            <h2 id="location-modal-title" data-i18n="search_title">Gdzie cię szukać?</h2>
             <p data-i18n="search_desc">Wpisz miasto (np. Warszawa lub Mała Wieś), w okolicy, która Cię interesuje.</p>
             <div class="input-group">
-                <input type="text" id="manual-location-input" data-i18n-ph="search_placeholder"
+                <input type="text" id="manual-location-input" class="text-input" data-i18n-ph="search_placeholder"
                     placeholder="np. Kraków...">
                 <button id="search-location-btn" class="action-btn"><i class="bi bi-search"></i></button>
             </div>
