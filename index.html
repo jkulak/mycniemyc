@@ -39,6 +39,32 @@
     <!-- Ikony Bootstrap, świetnie pasujące do aplikacji pogodowej i UI -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="./style.css">
+    <!-- Structured Data - JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Myć czy nie myć? / Wash or Not?",
+      "url": "https://mycniemyc.pl",
+      "description": "Free weather-based tool that tells you if today is a good day to wash your car. Checks 7-day precipitation forecast for your location.",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "PLN"
+      },
+      "creator": {
+        "@type": "Person",
+        "name": "Jakub Kulak",
+        "url": "https://github.com/jkulak"
+      },
+      "inLanguage": ["pl", "en"],
+      "browserRequirements": "Requires JavaScript",
+      "softwareVersion": "1.0",
+      "keywords": "car wash, weather, forecast, should I wash my car, mycie samochodu, pogoda"
+    }
+    </script>
 </head>
 
 <body>
